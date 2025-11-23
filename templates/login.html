@@ -32,16 +32,15 @@
       }
     </style>
   </head>
-      body {
-        /* Fill the viewport with the image. 'cover' will crop as needed so the screen is fully covered */
-        background-image: url("{% static 'images/fondo_laforneia.jpg' %}"), url("{% static 'images/fondo_lafornería.jpg' %}");
-        background-size: cover, cover;
-        background-position: center center, center center;
-        background-repeat: no-repeat, no-repeat;
-        /* Use fixed so the background stays put while scrolling */
-        background-attachment: fixed, fixed;
-        background-color: #111; /* dark fallback behind image */
-      }
+  <body>
+    <div class="container vh-100 d-flex align-items-center justify-content-center">
+      <div class="card p-4 position-relative" style="max-width:420px; width:100%;">
+        <div class="login-card p-3">
+          {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'logout' %}" class="position-absolute" style="right:12px; top:12px;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-secondary">Cerrar sesión</button>
+            </form>
           {% endif %}
           <h4 class="mb-3 text-center">Iniciar sesión</h4>
 

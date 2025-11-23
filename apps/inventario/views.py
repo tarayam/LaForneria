@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from project_utils.auth_helpers import reauth_required
 from django.utils import timezone
 from django.db import models
+from django.contrib import messages
 
 from .models import Productos, MovimientosInventario, IngresoStock
 from django.core.paginator import Paginator
@@ -19,6 +20,15 @@ def inventario_dashboard(request):
 	POST: recibe 'producto_id' y 'cantidad' y crea un movimiento de tipo 'ingreso'.
 	"""
 	message = None
+
+	# Restrict access: only staff or superuser may use inventory
+	if not request.user.is_staff and not request.user.is_superuser:
+		# Redirect sellers to POS with an error message
+		try:
+			messages.error(request, 'No tienes permiso para acceder al módulo de Inventario.')
+		except Exception:
+			pass
+		return redirect('pos_ventas')
 
 	if request.method == 'POST':
 		try:

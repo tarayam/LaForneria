@@ -14,6 +14,15 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+import os
+
+# ensure logs directory exists
+LOG_DIR = BASE_DIR / 'logs'
+try:
+    LOG_DIR.mkdir(exist_ok=True)
+except Exception:
+    # if creation fails, continue; logging may fallback to console
+    pass
 
 
 # Quick-start development settings - unsuitable for production
@@ -134,3 +143,31 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/'
 # Tiempo (segundos) durante el cual una reautenticación se considera válida
 REAUTHENTICATE_TIMEOUT = 300
+
+# Basic logging config: file for access / audit events
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'access_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(LOG_DIR / 'access.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'forneria.access': {
+            'handlers': ['access_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

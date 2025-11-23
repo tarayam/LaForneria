@@ -4,6 +4,19 @@ from project_utils.auth_helpers import reauth_required
 from django.utils import timezone
 from django.db import models
 from django.contrib import messages
+import logging
+
+# logger for access/audit events (written to logs/access.log via settings.LOGGING)
+logger = logging.getLogger('forneria.access')
+
+
+def _get_client_ip(request):
+	"""Try to obtain the client's IP address from request headers or REMOTE_ADDR."""
+	x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+	if x_forwarded:
+		# X-Forwarded-For can contain a list of IPs
+		return x_forwarded.split(',')[0].strip()
+	return request.META.get('REMOTE_ADDR')
 
 from .models import Productos, MovimientosInventario, IngresoStock
 from django.core.paginator import Paginator
@@ -27,6 +40,20 @@ def inventario_dashboard(request):
 		try:
 			messages.error(request, 'No tienes permiso para acceder al módulo de Inventario.')
 		except Exception:
+			pass
+		# Log the denied access attempt for auditing
+		try:
+			ip = _get_client_ip(request)
+			username = request.user.username if request.user.is_authenticated else 'anonymous'
+			logger.warning(
+				"Denied inventory access attempt: user=%s id=%s ip=%s path=%s",
+				username,
+				getattr(request.user, 'pk', None),
+				ip,
+				request.path,
+			)
+		except Exception:
+			# ensure logging problems don't break the redirect flow
 			pass
 		return redirect('pos_ventas')
 

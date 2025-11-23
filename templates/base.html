@@ -27,6 +27,9 @@
             <div class="btn-group" role="group" aria-label="Navegación rápida">
               {% if request.user.is_staff or request.user.is_superuser %}
                 <a class="btn btn-outline-light btn-sm" href="{% url 'inventario_dashboard' %}">Inventario</a>
+              {% else %}
+                <!-- Mostrar botón no interactivo para vendedores; al hacer clic se mostrará un mensaje JS -->
+                <button type="button" id="inventario-disabled" class="btn btn-outline-light btn-sm">Inventario</button>
               {% endif %}
               <a class="btn btn-outline-light btn-sm" href="{% url 'pos_ventas' %}">Ventas</a>
               {% if request.user.is_superuser %}
@@ -66,6 +69,27 @@
       <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+      </script>
+      <script>
+        // Show client-side alert when a vendedor clicks the disabled Inventario button
+        document.addEventListener('DOMContentLoaded', function(){
+          const btn = document.getElementById('inventario-disabled');
+          if(!btn) return;
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            // create bootstrap alert element and insert at top of main container
+            const container = document.querySelector('main.container-fluid');
+            if(!container) return alert('No tienes permiso para acceder al módulo de Inventario.');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = 'No tienes permiso para acceder al módulo de Inventario.' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            container.prepend(alertDiv);
+            // optionally auto-dismiss after 4 seconds
+            setTimeout(()=>{ try{ const bs = bootstrap.Alert.getOrCreateInstance(alertDiv); bs.close(); }catch(e){} }, 4000);
+          });
+        });
       </script>
     {% endblock %}
   </body>

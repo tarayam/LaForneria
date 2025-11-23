@@ -27,6 +27,9 @@
             <div class="btn-group" role="group" aria-label="Navegación rápida">
               <a class="btn btn-outline-light btn-sm" href="{% url 'inventario_dashboard' %}">Inventario</a>
               <a class="btn btn-outline-light btn-sm" href="{% url 'pos_ventas' %}">Ventas</a>
+              {% if request.user.is_superuser %}
+                <a class="btn btn-outline-warning btn-sm" href="{% url 'admin:index' %}" title="Administración">Admin</a>
+              {% endif %}
             </div>
             <span class="text-light small">Usuario: {{ request.user.get_full_name|default:request.user.username }}</span>
             <form method="post" action="{% url 'logout' %}" class="m-0 d-inline">

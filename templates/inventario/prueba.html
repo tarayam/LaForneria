@@ -3,6 +3,18 @@
 
 {% block content %}
   <link rel="stylesheet" href="{% static 'css/inventario.css' %}">
+  <style>
+    html, body { height:100%; min-height:100vh; margin:0; padding:0; }
+    body {
+      background-image: url("{% static 'images/fondo_lafornería.jpg' %}"), url("{% static 'images/fondo_lafornería.jpg' %}");
+      background-size: cover, cover;
+      background-position: top center, top center;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+      background-color: #111;
+    }
+    .confirm-card, .card { background: rgba(255,255,255,0.92); }
+  </style>
 <div class="container-fluid mt-4">
   <div class="row">
     <aside class="col-lg-4 inventory-sidebar">
